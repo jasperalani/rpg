@@ -7,6 +7,11 @@ using RPG.Combat;
 
 public class PlayerController : MonoBehaviour
 {
+
+    public float clickDistance = 50;
+    public GameObject selectedEnemy;
+
+
    // inputs
     public Controls controls;
     [SerializeField] private Vector2 inputs;
@@ -398,19 +403,36 @@ public class PlayerController : MonoBehaviour
          
         foreach (RaycastHit hit in hits)
         {
-            EnemyTarget target = hit.transform.GetComponent<EnemyTarget>();
-            if (target == null) continue;
 
-            if (Input.GetMouseButtonDown(0))
+            RaycastHit hitEnemy;
+            if(Physics.Raycast(GetMouseHitRay(), out hitEnemy, clickDistance))
             {
-                GetComponent<PlayerCombat>().selectEnemy(target);
+                EnemyTarget target = hit.transform.GetComponent<EnemyTarget>();
+                if (target == null) continue;
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    GetComponent<PlayerCombat>().selectEnemy(target);
+                    selectedEnemy = hit.transform.gameObject;
+                }
             }
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            deselectEnemy();
         }
     }
 
     private static Ray GetMouseHitRay()
     {
         return Camera.main.ScreenPointToRay(Input.mousePosition);
+    }
+
+    void deselectEnemy()
+    {
+        selectedEnemy = null;
     }
 
 }
